@@ -1,0 +1,18 @@
+version: '3'
+services:
+  hello-service:
+    image: "idawud/hello:v1"
+    ports:
+      - "5000:5000"
+  todo-service:
+    image: "jpgough/api-workshop-solution"
+    ports:
+      - "8080:8080"
+  api-gateway:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    expose:
+      - "80"
+    ports:
+      - "8081:8081"
