@@ -23,6 +23,10 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
+
+	compile 'io.jsonwebtoken:jjwt-api:0.10.7'
+	runtime 'io.jsonwebtoken:jjwt-impl:0.10.7',
+			'io.jsonwebtoken:jjwt-jackson:0.10.7'
 }
 
 dependencyManagement {
