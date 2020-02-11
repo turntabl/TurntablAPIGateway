@@ -18,12 +18,12 @@ public class TurntablApiGatewayApplication {
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("hello", r ->
-                        r.host("hello.**")
+                        r.path("/hello/**")
                        .filters(f -> f.rewritePath("/hello/(?<segment>.*)", "/${segment}")
                                .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
                         .uri("http://hello-service:5000"))
                 .route("todo",
-                        r -> r.host("todo.**")
+                        r -> r.path("/todo/**")
                         .filters(f -> f.rewritePath("/todo/(?<segment>.*)", "/${segment}")
                                 .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
                         .uri("http://todo-service:8080"))
