@@ -1,1 +1,1 @@
-./gradlew bootJar && docker-compose build && docker-compose up
+sudo ./gradlew bootJar && sudo docker-compose build && sudo docker-compose up
