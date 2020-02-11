@@ -19,11 +19,13 @@ public class TurntablApiGatewayApplication {
         return builder.routes()
                 .route("hello", r ->
                         r.host("hello.**")
-                       .filters(f -> f.filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
+                       .filters(f -> f.rewritePath("/hello/(?<segment>.*)", "/${segment}")
+                               .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
                         .uri("http://hello-service:5000"))
                 .route("todo",
                         r -> r.host("todo.**")
-                        .filters(f ->  f.filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
+                        .filters(f -> f.rewritePath("/todo/(?<segment>.*)", "/${segment}")
+                                .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
                         .uri("http://todo-service:8080"))
                 .build();
     }
