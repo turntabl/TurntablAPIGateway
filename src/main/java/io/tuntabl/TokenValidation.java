@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public class TokenValidation {
 
-    public static boolean isTokenValidated(String authorizationHeader, RSAPublicKey  pubKey) {
+    public static ValidationResponse isTokenValidated(String authorizationHeader, RSAPublicKey  pubKey) {
         String ISSUER = System.getenv("ISSUER");
         String CLIENT_ID = System.getenv("CLIENT_ID");
         String HOST_DOMAIN = System.getenv("HOST_DOMAIN");
@@ -24,10 +24,14 @@ public class TokenValidation {
             boolean aud = Jwts.parser().setSigningKey(pubKey).parseClaimsJws(authorizationHeader).getBody().get("aud").equals(CLIENT_ID);
             boolean hd = Jwts.parser().setSigningKey(pubKey).parseClaimsJws(authorizationHeader).getBody().get("hd").equals(HOST_DOMAIN);
 
-            return iss && aud && hd;
+            boolean isValid = iss && aud && hd;
+            if ( isValid){
+                return new ValidationResponse(true, "Valid Token");
+            }
+            return new ValidationResponse(false, "In Valid Token");
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
             e.printStackTrace();
-            return false;
+            return new ValidationResponse(false, e.getMessage());
         }
     }
 

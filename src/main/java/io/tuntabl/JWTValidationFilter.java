@@ -22,10 +22,10 @@ public class JWTValidationFilter extends AbstractGatewayFilterFactory<JWTValidat
         super(Config.class);
     }
 
-    private boolean isAuthorizationValid(String authorizationHeader) {
+    private ValidationResponse isAuthorizationValid(String authorizationHeader) {
         /* Logic for checking the value */
         Optional<RSAPublicKey> publicKey = TokenValidation.getParsedPublicKey();
-        return publicKey.filter(rsaPublicKey -> TokenValidation.isTokenValidated(authorizationHeader, rsaPublicKey)).isPresent();
+        return publicKey.map(rsaPublicKey -> TokenValidation.isTokenValidated(authorizationHeader, rsaPublicKey)).orElseGet(() -> new ValidationResponse(false, "Internal Error processing this token"));
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus, String err)  {
@@ -41,13 +41,18 @@ public class JWTValidationFilter extends AbstractGatewayFilterFactory<JWTValidat
             ServerHttpRequest request = exchange.getRequest();
 
             if (!request.getHeaders().containsKey("Authorization")) {
-                return this.onError(exchange, HttpStatus.FORBIDDEN, "No Authorization Header");
+                return this.onError(exchange, HttpStatus.FORBIDDEN, "{ \"error\" : \"No Authorization Header\" }");
             }
 
             String authorizationHeader = Objects.requireNonNull(request.getHeaders().get("Authorization")).get(0);
 
-            if (!this.isAuthorizationValid(authorizationHeader)) {
-                return this.onError(exchange,  HttpStatus.UNAUTHORIZED, "Invalid Authorization Token");
+            ValidationResponse authorizationValid = this.isAuthorizationValid(authorizationHeader);
+            if (!authorizationValid.isValid()) {
+                if ( authorizationValid.getError().equals("Internal Error processing this token")){
+                    return this.onError(exchange,  HttpStatus.INTERNAL_SERVER_ERROR, authorizationValid.toString());
+                }else {
+                    return this.onError(exchange, HttpStatus.UNAUTHORIZED, authorizationValid.toString());
+                }
             }
 
             ServerHttpRequest modifiedRequest = exchange.getRequest().mutate().
