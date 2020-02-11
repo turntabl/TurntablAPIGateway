@@ -2,19 +2,23 @@ package io.tuntabl;
 
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.nio.charset.StandardCharsets;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
-public class MyFilter extends AbstractGatewayFilterFactory<MyFilter.Config> {
-    public MyFilter() {
+public class JWTValidationFilter extends AbstractGatewayFilterFactory<JWTValidationFilter.Config> {
+    public JWTValidationFilter() {
         super(Config.class);
     }
 
@@ -24,11 +28,11 @@ public class MyFilter extends AbstractGatewayFilterFactory<MyFilter.Config> {
         return publicKey.filter(rsaPublicKey -> TokenValidation.isTokenValidated(authorizationHeader, rsaPublicKey)).isPresent();
     }
 
-    private Mono<Void> onError(ServerWebExchange exchange, String err)  {
-        ServerHttpResponse response = exchange.getResponse();
-        response.setStatusCode(HttpStatus.UNAUTHORIZED);
-        System.err.println("Error:....xxxx.... " + err);
-        return response.setComplete();
+    private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus, String err)  {
+        exchange.getResponse().setStatusCode(httpStatus);
+        byte[] bytes = err.getBytes(StandardCharsets.UTF_8);
+        DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(bytes);
+        return exchange.getResponse().writeWith(Flux.just(buffer));
     }
 
     @Override
@@ -37,18 +41,17 @@ public class MyFilter extends AbstractGatewayFilterFactory<MyFilter.Config> {
             ServerHttpRequest request = exchange.getRequest();
 
             if (!request.getHeaders().containsKey("Authorization")) {
-                System.out.println("\"No Authorization header");
-                return this.onError(exchange, "No Authorization header");
+                return this.onError(exchange, HttpStatus.FORBIDDEN, "No Authorization Header");
             }
 
-            String authorizationHeader = request.getHeaders().get("Authorization").get(0);
+            String authorizationHeader = Objects.requireNonNull(request.getHeaders().get("Authorization")).get(0);
 
             if (!this.isAuthorizationValid(authorizationHeader)) {
-                return this.onError(exchange, "Invalid Authorization header");
+                return this.onError(exchange,  HttpStatus.UNAUTHORIZED, "Invalid Authorization Token");
             }
 
             ServerHttpRequest modifiedRequest = exchange.getRequest().mutate().
-                    header("Bearer").
+                    header("secret").
                     build();
 
             return chain.filter(exchange.mutate().request(modifiedRequest).build());

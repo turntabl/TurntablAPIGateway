@@ -1,7 +1,8 @@
 package io.tuntabl;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -14,22 +15,25 @@ import java.util.Optional;
 
 public class TokenValidation {
 
-    public static boolean isTokenValidated(String jwt, RSAPublicKey  pubKey) {
+    public static boolean isTokenValidated(String authorizationHeader, RSAPublicKey  pubKey) {
         String ISSUER = System.getenv("ISSUER");
         String CLIENT_ID = System.getenv("CLIENT_ID");
         String HOST_DOMAIN = System.getenv("HOST_DOMAIN");
+        try {
+            boolean iss = Jwts.parser().setSigningKey(pubKey).parseClaimsJws(authorizationHeader).getBody().get("iss").equals(ISSUER);
+            boolean aud = Jwts.parser().setSigningKey(pubKey).parseClaimsJws(authorizationHeader).getBody().get("aud").equals(CLIENT_ID);
+            boolean hd = Jwts.parser().setSigningKey(pubKey).parseClaimsJws(authorizationHeader).getBody().get("hd").equals(HOST_DOMAIN);
 
-        boolean iss = Jwts.parser().setSigningKey(pubKey).parseClaimsJws(jwt).getBody().get("iss").equals(ISSUER);
-        boolean aud = Jwts.parser().setSigningKey(pubKey).parseClaimsJws(jwt).getBody().get("aud").equals(CLIENT_ID);
-        boolean hd = Jwts.parser().setSigningKey(pubKey).parseClaimsJws(jwt).getBody().get("hd").equals(HOST_DOMAIN);
-
-        return iss && aud && hd;
+            return iss && aud && hd;
+        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    public static Claims getClaim(RSAPublicKey pubKey, String jwts ){
-        return Jwts.parser()
-                .setSigningKey(pubKey)
-                .parseClaimsJws(jwts).getBody();
+    public static boolean isTokenExpired(RSAPublicKey pubKey, String authorizationHeader ){
+        Claims claim = Jwts.parser().setSigningKey(pubKey).parseClaimsJws(authorizationHeader).getBody();
+        return (new Date()).after(claim.getExpiration());
     }
 
     public static Optional<RSAPublicKey> getParsedPublicKey(){
@@ -50,8 +54,4 @@ public class TokenValidation {
         }
     }
 
-    public static boolean isTokenExpired(Claims claims) {
-        Date now = new Date();
-        return now.after(claims.getExpiration());
-    }
 }

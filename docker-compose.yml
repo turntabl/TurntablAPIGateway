@@ -12,7 +12,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    expose:
-      - "80"
+    env_file:
+      - .env
     ports:
       - "8081:8081"

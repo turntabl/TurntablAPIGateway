@@ -1,6 +1,5 @@
 package io.tuntabl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -9,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class TurntablApiGatewayApplication {
-    MyFilter myFilter = new MyFilter();
+    JWTValidationFilter JWTValidationFilter = new JWTValidationFilter();
 
 	public static void main(String[] args) {
 		SpringApplication.run(TurntablApiGatewayApplication.class, args);
@@ -20,11 +19,11 @@ public class TurntablApiGatewayApplication {
         return builder.routes()
                 .route("hello", r ->
                         r.host("hello.**")
-                       .filters(f -> f.filter(myFilter.apply(myFilter.newConfig())))
+                       .filters(f -> f.filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
                         .uri("http://hello-service:5000"))
                 .route("todo",
                         r -> r.host("todo.**")
-                        .filters(f -> f.rewritePath("/todo/(?<segment>.*)", "/${segment}"))
+                        .filters(f ->  f.filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
                         .uri("http://todo-service:8080"))
                 .build();
     }
