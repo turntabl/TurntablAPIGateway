@@ -27,6 +27,15 @@ public class TurntablApiGatewayApplication {
                         .filters(f -> f.rewritePath("/todo/(?<segment>.*)", "/${segment}")
                                 .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
                         .uri("http://todo-service:8080"))
+                .route("permission",
+                        r -> r.path("/permission/**")
+                            .filters(f -> f.rewritePath("/permission/(?<segment>.*)", "/${segment}")
+                                    .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
+                            .uri("https://permission.services.turntabl.io"))
+                .route("gis",
+                        r -> r.path("/gis/**")
+                            .filters(f -> f.rewritePath("/gis/(?<segment>.*)", "/${segment}") )
+                            .uri("http://gis-service:5004"))
                 .build();
     }
 

@@ -10,6 +10,12 @@ services:
     image: "jpgough/api-workshop-solution"
     ports:
       - 8000
+  gis-service:
+    image: "isammyk/gis-docker:latest"
+    env_file:
+      - .envs/.gis-env
+    ports:
+      - 5004
   api-gateway:
     build:
       context: ./
