@@ -18,7 +18,7 @@ services:
       - 5004
   api-gateway:
     build:
-      context: ./
+      context: https://github.com/idawud/TurntablAPIGateway.git
       dockerfile: Dockerfile
     env_file:
       - .envs/.gateway-env
