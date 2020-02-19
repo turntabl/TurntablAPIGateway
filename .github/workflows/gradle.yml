@@ -1,4 +1,4 @@
-name: Java CI
+name: Service CI
 
 on: [push]
 
@@ -17,3 +17,13 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew bootJar
+    - name: Build & Push to Docker Hub
+      uses: opspresso/action-docker@master
+      with:
+        args: --docker
+      env:
+        USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        IMAGE_NAME: "idawud/turntablApiGateway"
+        TAG_NAME: "v0.0.1"
+        LATEST: "true"
