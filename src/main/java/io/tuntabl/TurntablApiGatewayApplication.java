@@ -17,16 +17,6 @@ public class TurntablApiGatewayApplication {
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("hello", r ->
-                        r.path("/hello/**")
-                       .filters(f -> f.rewritePath("/hello/(?<segment>.*)", "/${segment}")
-                               .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
-                        .uri("http://hello-service:5000"))
-                .route("todo",
-                        r -> r.path("/todo/**")
-                        .filters(f -> f.rewritePath("/todo/(?<segment>.*)", "/${segment}")
-                                .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
-                        .uri("http://todo-service:8080"))
                 .route("permission",
                         r -> r.path("/permission/**")
                             .filters(f -> f.rewritePath("/permission/(?<segment>.*)", "/${segment}")
@@ -35,7 +25,7 @@ public class TurntablApiGatewayApplication {
                 .route("gis",
                         r -> r.path("/gis/**")
                             .filters(f -> f.rewritePath("/gis/(?<segment>.*)", "/${segment}") )
-                            .uri("http://gis-service:5004"))
+                            .uri("http://gis:5004"))
                 .build();
     }
 
