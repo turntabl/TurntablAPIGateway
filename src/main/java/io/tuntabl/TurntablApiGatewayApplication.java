@@ -19,8 +19,7 @@ public class TurntablApiGatewayApplication {
         return builder.routes()
                 .route("permission",
                         r -> r.path("/permission/**")
-                            .filters(f -> f.rewritePath("/permission/(?<segment>.*)", "/${segment}")
-                                    .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
+                            .filters(f -> f.rewritePath("/permission/(?<segment>.*)", "/${segment}") )
                             .uri("https://permission.services.turntabl.io"))
                 .route("gis",
                         r -> r.path("/gis/**")
