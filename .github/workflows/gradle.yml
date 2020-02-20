@@ -32,6 +32,7 @@ jobs:
       with:
         command: | 
           cd Services-Registery
+          echo -e ${{ secrets.ENV }} > ./.envs/.${{ secrets.SERVICE }}
           sudo docker-compose stop ${{ secrets.SERVICE }}
           sudo docker-compose rm -f -v ${{ secrets.SERVICE }}
           sudo docker-compose create --force-recreate ${{ secrets.SERVICE }}
