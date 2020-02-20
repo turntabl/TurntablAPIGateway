@@ -29,7 +29,7 @@ public class TurntablApiGatewayApplication {
                 .route("tt",
                         r -> r.path("/tt/**")
                             .filters(f -> f.rewritePath("/tt/(?<segment>.*)", "/${segment}") )
-                            .uri("https://turntabl.io/"))
+                            .uri("http://gis:5004"))
                 .build();
     }
 
