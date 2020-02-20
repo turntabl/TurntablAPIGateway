@@ -19,11 +19,11 @@ public class TurntablApiGatewayApplication {
         return builder.routes()
                 .route("permission",
                         r -> r.path("/permission/**")
-                            .filters(f -> f.rewritePath("/permission/(?<segment>.*)", "/${segment}") )
+                            .filters(f -> f.rewritePath("/permission/(?<segment>.*)", "/${segment}"))
                             .uri("https://permission.services.turntabl.io"))
                 .route("gis",
                         r -> r.path("/gis/**")
-                            .filters(f -> f.rewritePath("/gis/(?<segment>.*)", "/${segment}") )
+                            .filters(f -> f.rewritePath("/gis/(?<segment>.*)", "/${segment}"))
                             .uri("http://gis:5004"))
                 .build();
     }
