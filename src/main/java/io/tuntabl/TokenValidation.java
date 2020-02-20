@@ -1,6 +1,5 @@
 package io.tuntabl;
 
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 

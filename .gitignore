@@ -33,3 +33,6 @@ out/
 
 dump.txt
 .envs/
+bin/
+.classpath/
+.project/
