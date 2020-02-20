@@ -32,8 +32,10 @@ jobs:
       with:
         command: | 
           cd Services-Registery
-          docker-compose-restart(){ sudo docker-compose stop $@ && sudo docker-compose rm -f -v $@ && sudo docker-compose create --force-recreate $@ sudo docker-compose start $@; }
-          docker-compose-restart  ${{ secrets.SERVICE }}
+          sudo docker-compose stop ${{ secrets.SERVICE }}
+          sudo docker-compose rm -f -v ${{ secrets.SERVICE }}
+          sudo docker-compose create --force-recreate ${{ secrets.SERVICE }}
+          sudo docker-compose start ${{ secrets.SERVICE }}
         host: ${{ secrets.EC2_HOST }}
         user: ubuntu
         key: ${{ secrets.EC2}}
