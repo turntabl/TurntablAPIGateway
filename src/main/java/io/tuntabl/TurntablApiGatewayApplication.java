@@ -25,6 +25,10 @@ public class TurntablApiGatewayApplication {
                         r -> r.path("/gis/**")
                             .filters(f -> f.rewritePath("/gis/(?<segment>.*)", "/${segment}"))
                             .uri("http://gis:5004"))
+                .route("chess",
+                        r -> r.path("/chess/**")
+                            .filters(f -> f.rewritePath("/chess/(?<segment>.*)", "/${segment}"))
+                            .uri("http://chess:8080"))
                 .build();
     }
 
