@@ -32,7 +32,7 @@ jobs:
       with:
         command: | 
           cd Services-Registery
-          docker-compose-restart(){ docker-compose stop $@ && docker-compose rm -f -v $@ && docker-compose create --force-recreate $@ docker-compose start $@; }
+          docker-compose-restart(){ sudo docker-compose stop $@ && sudo docker-compose rm -f -v $@ && sudo docker-compose create --force-recreate $@ sudo docker-compose start $@; }
           docker-compose-restart  ${{ secrets.SERVICE }}
         host: ${{ secrets.EC2_HOST }}
         user: ubuntu
