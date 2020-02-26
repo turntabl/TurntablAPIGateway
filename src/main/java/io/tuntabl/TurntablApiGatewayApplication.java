@@ -18,7 +18,7 @@ public class TurntablApiGatewayApplication {
 
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-        return builder.routes()
+        return builder.routes() 
                 .route("hello",
                         r -> r.path("/hello/**")
                             .filters(f -> f.rewritePath("/hello/(?<segment>.*)", "/${segment}")
@@ -29,6 +29,7 @@ public class TurntablApiGatewayApplication {
                                 .filters(f -> f.rewritePath("/holiday/(?<segment>.*)", "/${segment}")
                                         .filter(addHeader.apply(addHeader.newConfig().setName("serviceName").setValue(System.getenv("HOLIDAY_SERVICE_HEADER")))))
                                 .uri("http://turnt-publi-1ios56ej76ufj-1502995462.us-east-2.elb.amazonaws.com/"))
+ 
                 .build();
     }
 
