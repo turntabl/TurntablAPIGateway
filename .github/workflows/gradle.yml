@@ -15,10 +15,13 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+
     - name: Build with Gradle
       run: ./gradlew bootJar
+
     - name: Build & Push to Docker Hub
       uses: opspresso/action-docker@master
       with:
@@ -29,19 +32,31 @@ jobs:
         IMAGE_NAME: "idawud/turntablapigateway"
         TAG_NAME: "latest"
         LATEST: "true"
-    - name: OPEN SSH Private Key
-      uses: fifsky/ssh-action@master
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
       with:
-        command: | 
-          cd Services-Registery
-          echo -e "test" > test.txt
-          echo -e ${{ secrets.ENV }} > .envs/.${{ secrets.SERVICE }}
-          sudo docker-compose stop ${{ secrets.SERVICE }}
-          sudo docker-compose rm -f -v ${{ secrets.SERVICE }}
-          sudo docker-compose pull ${{ secrets.SERVICE }}
-          sudo docker-compose up -d --force-recreate --no-deps --build ${{ secrets.SERVICE }}
-          sudo docker-compose start ${{ secrets.SERVICE }}
-        host: ${{ secrets.EC2_HOST }}
-        user: ubuntu
-        key: ${{ secrets.EC2}}
-        args: "-tt -vvv"
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+
+      - name: Copy task file from S3 with the AWS CLI
+        run: |
+          aws s3 cp s3://ecstasks/gateway-task-definition.json .
+          mv gateway-task-definition.json task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: gateway
+          image: idawud/turntablapigateway:latest
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: gateway
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          wait-for-service-stability: true
