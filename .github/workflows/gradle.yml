@@ -40,23 +40,23 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
 
-      - name: Copy task file from S3 with the AWS CLI
-        run: |
-          aws s3 cp s3://ecstasks/gateway-task-definition.json .
-          mv gateway-task-definition.json task-definition.json
+    - name: Copy task file from S3 with the AWS CLI
+      run: |
+        aws s3 cp s3://ecstasks/gateway-task-definition.json .
+        mv gateway-task-definition.json task-definition.json
 
-      - name: Fill in the new image ID in the Amazon ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          container-name: gateway
-          image: idawud/turntablapigateway:latest
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: task-definition.json
+        container-name: gateway
+        image: idawud/turntablapigateway:latest
 
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: gateway
-          cluster: ${{ secrets.ECS_CLUSTER }}
-          wait-for-service-stability: true
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: gateway
+        cluster: ${{ secrets.ECS_CLUSTER }}
+        wait-for-service-stability: true
