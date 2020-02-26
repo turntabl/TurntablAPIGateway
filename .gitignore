@@ -36,3 +36,4 @@ dump.txt
 bin/
 .classpath/
 .project/
+.gitsecret/keys/random_seed
