@@ -29,7 +29,6 @@ public class TurntablApiGatewayApplication {
                                 .filters(f -> f.rewritePath("/holiday/(?<segment>.*)", "/${segment}")
                                         .filter(addHeader.apply(addHeader.newConfig().setName("serviceName").setValue(System.getenv("HOLIDAY_SERVICE_HEADER")))))
                                 .uri("http://turnt-publi-1ios56ej76ufj-1502995462.us-east-2.elb.amazonaws.com/"))
- 
                 .build();
     }
 
