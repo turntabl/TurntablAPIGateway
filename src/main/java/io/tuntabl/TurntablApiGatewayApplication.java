@@ -34,6 +34,10 @@ public class TurntablApiGatewayApplication {
                     r -> r.path("/permission/**")
                         .filters(f -> f.rewritePath("/permission/(?<segment>.*)", "/${segment}") )
                         .uri("http://permission:5000")) 
+                .route("empire",
+                    r -> r.path("/empire/**")
+                        .filters(f -> f.rewritePath("/empire/(?<segment>.*)", "/${segment}") )
+                        .uri("http://empire:8050"))
                 .build();
     }
 
