@@ -17,26 +17,20 @@ public class TurntablApiGatewayApplication {
 
     @Bean
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
-        return builder.routes()  
-                .route("gis",
-                    r -> r.path("/gis/**")
-                        .filters(f -> f.rewritePath("/gis/(?<segment>.*)", "/${segment}") )
-                        .uri("http://gis:5004"))
+        return builder.routes()   
                 .route("holiday",
                     r -> r.path("/holiday/**")
-                        .filters(f -> f.rewritePath("/holiday/(?<segment>.*)", "/${segment}") )
+                        .filters(f -> f.rewritePath("/holiday/(?<segment>.*)", "/${segment}") 
+                        .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
                         .uri("http://holiday:7070"))
-                .route("chess",
-                    r -> r.path("/chess/**")
-                        .filters(f -> f.rewritePath("/chess/(?<segment>.*)", "/${segment}") )
-                        .uri("http://chess:8080"))
                 .route("permission",
                     r -> r.path("/permission/**")
                         .filters(f -> f.rewritePath("/permission/(?<segment>.*)", "/${segment}") )
                         .uri("http://permission:5000")) 
                 .route("empire",
                     r -> r.path("/empire/**")
-                        .filters(f -> f.rewritePath("/empire/(?<segment>.*)", "/${segment}") )
+                        .filters(f -> f.rewritePath("/empire/(?<segment>.*)", "/${segment}") 
+                        .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
                         .uri("http://empire:8050"))
                 .route("jaeger",
                     r -> r.path("/jaeger/**")
