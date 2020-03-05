@@ -37,7 +37,7 @@ public class TurntablApiGatewayApplication {
                     r -> r.path("/jaeger/**")
                         .filters(f -> f.rewritePath("/jaeger/(?<segment>.*)", "/${segment}") )
                         .uri("http://jaeger:16686"))
-                        */
+                    */
                 .build();
     }
 
