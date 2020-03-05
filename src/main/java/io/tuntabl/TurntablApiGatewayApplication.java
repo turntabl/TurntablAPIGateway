@@ -30,12 +30,14 @@ public class TurntablApiGatewayApplication {
                 .route("empire",
                     r -> r.path("/empire/**")
                         .filters(f -> f.rewritePath("/empire/(?<segment>.*)", "/${segment}") 
-                        .filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig())))
+                        //.filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig()))
+                        )
                         .uri("http://empire:8050"))
-                .route("jaeger",
+                /*.route("jaeger",
                     r -> r.path("/jaeger/**")
                         .filters(f -> f.rewritePath("/jaeger/(?<segment>.*)", "/${segment}") )
                         .uri("http://jaeger:16686"))
+                    */
                 .build();
     }
 
