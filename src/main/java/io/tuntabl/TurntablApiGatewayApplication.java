@@ -29,7 +29,7 @@ public class TurntablApiGatewayApplication {
                         .uri("http://permission:5000")) 
                 .route("empire",
                     r -> r.path("/empire/**")
-                        .filters(f -> f.rewritePath("/empire/(?<segment>.*)", "/${segment}") 
+                        .filters(f -> f.rewritePath("/empire/(?<segment>.*)", "/${segment}")
                         //.filter(JWTValidationFilter.apply(JWTValidationFilter.newConfig()))
                         )
                         .uri("http://empire:8050"))
