@@ -1,0 +1,28 @@
+server:
+    port: 8081
+
+spring:
+    cloud:
+        gateway:
+            default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin Access-Control-Allow-Headers
+            routes:
+                - id: empire
+                  uri: http://empire:8050
+                  predicates:
+                      - Path=/empire/**
+                  filters:
+                      - RewritePath=/empire(?<segment>/?.*), $\{segment}
+                - id: holiday
+                  uri: http://holiday:7070
+                  predicates:
+                    - Path=/holiday/**
+                  filters:
+                    - RewritePath=/holiday(?<segment>/?.*), $\{segment}
+                    - JWTValidationFilter
+                - id: permission
+                  uri: http://permission:5000
+                  predicates:
+                    - Path=/permission/**
+                  filters:
+                    - RewritePath=/permission(?<segment>/?.*), $\{segment}
